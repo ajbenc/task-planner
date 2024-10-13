@@ -1,6 +1,6 @@
 import { loadMenu } from "./menu";
 import { loadContact } from "./contact";
-import homeImg from './imgs/home.jpg';
+ 
 
 const addLogoToNavbar = () => {
     const navBar = document.querySelector("nav");
