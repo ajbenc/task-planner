@@ -1,12 +1,12 @@
 import { loadSidebarTitle } from "./sidebar";
 import { tabSwitch } from "./tabActions";
-import { loadHome } from "./home";
+import { loadBoard } from "./board";
 import "./styles.css";
 
 function init() {
     loadSidebarTitle();
     tabSwitch();
-    loadHome();
+    loadBoard();
 }
 
 init();

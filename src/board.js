@@ -1,4 +1,5 @@
-export function loadHome () {
+export function loadBoard
+ () {
 
     const content = document.querySelector ("#content");
     content.textContent = '';

@@ -1,13 +1,12 @@
-import { loadTask } from "./task";
 import { loadStickyNotes } from "./stickyNotes";
-import { loadHome } from "./home";
+import { loadBoard } from "./board";
 import { loadProject } from "./projects";
 import { loadToday } from "./today";
 import { loadComing } from "./upcoming";
 
 export function tabSwitch() {
     const listItems = [
-        document.querySelector("#homeBtn"),
+        document.querySelector("#boardBtn"),
         document.querySelector("#projectsBtn"),
         document.querySelector("#tasksBtn"),
         document.querySelector("#stickyBtn"),
@@ -45,7 +44,7 @@ function loadTab(event) {
             loadStickyNotes(contentDiv);
             break;
         default:
-            loadHome(contentDiv);
+            loadBoard(contentDiv);
             break; 
     }
 }
