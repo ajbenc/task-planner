@@ -61,3 +61,19 @@ displayTasks(displayTaskSection, upcomingTasks, deleteTask);
 });
 
 }
+
+export function loadTodayTasks() {
+    const tasks = localStorage.getItem('todayTasks');
+    return tasks ? JSON.parse(tasks) : [];
+}
+
+
+export function loadUpcomingTasks() {
+    let tasks = loadTasksFromStorage();  
+    const today = new Date();
+
+    return tasks.filter(task => {
+        const taskDate = new Date(task.dueDate);
+        return taskDate > today;  
+    });
+}

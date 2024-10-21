@@ -3,6 +3,7 @@ import { saveTask, deleteTask, displayTasks, loadTasksFromStorage } from './task
 
 let todayTasks = loadTasksFromStorage();   
 
+
 export function loadToday() {
     const content = document.querySelector("#content");
     content.textContent = '';  
@@ -76,3 +77,11 @@ export function loadToday() {
         displayTasks(displayTaskSection, todayTasks, deleteTask);
     });
 }
+
+export function loadTodayTasks() {
+    const tasks = localStorage.getItem('todayTasks');
+    return tasks ? JSON.parse(tasks) : [];
+}
+
+
+ 

@@ -1,6 +1,6 @@
 import { loadStickyNotes } from "./stickyNotes";
 import { loadBoard } from "./board";
-import { loadProject } from "./projects";
+import { loadProjects } from "./projects";
 import { loadToday } from "./today";
 import { loadComing } from "./upcoming";
 
@@ -29,7 +29,7 @@ function loadTab(event) {
 
     switch (currentTab) {
         case "projectsBtn":
-            loadProject(contentDiv);
+            loadProjects(contentDiv);
             break;
         case "tasksBtn":
             loadTask(contentDiv);
