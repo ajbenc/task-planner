@@ -4,6 +4,7 @@ import { loadProjects } from "./projects";
 import { loadToday } from "./today";
 import { loadComing } from "./upcoming";
 
+
 export function tabSwitch() {
     const listItems = [
         document.querySelector("#boardBtn"),
@@ -48,3 +49,4 @@ function loadTab(event) {
             break; 
     }
 }
+

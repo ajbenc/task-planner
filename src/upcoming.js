@@ -1,79 +1,101 @@
 import { createTaskForm } from "./form";
 import { saveTask, deleteTask, displayTasks, loadTasksFromStorage } from "./taskManager";
+import { getProjectsArray } from "./projects";   
 
-let upcomingTasks = loadTasksFromStorage().filter(task => new Date(task.dueDate) > new Date());
+let upcomingTasks = loadUpcomingTasks();   
 
 export function loadComing() {
-
     const content = document.querySelector("#content");
-    content.textContent = '';
+    content.textContent = '';  
 
     const heading = document.createElement('h1');
     heading.textContent = "Upcoming Tasks";
 
     const addTaskButton = document.createElement('button');
     addTaskButton.textContent = "New Task";
+    addTaskButton.id = "new-task"; 
 
     const formElements = createTaskForm();
-    const { taskForm } = formElements;
+    const { taskForm, projectSelect } = formElements;
 
     const displayTaskSection = document.createElement('div');
     displayTaskSection.id = 'displayTask';
 
     content.appendChild(heading);
     content.appendChild(addTaskButton);
-    content.appendChild(taskForm);
     content.appendChild(displayTaskSection);
 
+    // Create and style the overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.style.display = 'none'; // Initially hidden
+
+    // Append overlay and form to the body
+    document.body.appendChild(overlay);
+    document.body.appendChild(taskForm); // Append form to body so it layers correctly
+
+    taskForm.className = 'modal-form';
+    taskForm.style.display = 'none';
+
     addTaskButton.addEventListener('click', () => {
-        taskForm.style.display = 'block';
+        taskForm.style.display = 'block';  
+        overlay.style.display = 'block'; // Show overlay (blurry effect)
+
+        while (projectSelect.options.length > 1) {
+            projectSelect.remove(1);
+        }
+
+        const projectsArray = getProjectsArray();
+        projectsArray.forEach(project => {
+            const projectOption = document.createElement('option');
+            projectOption.value = project.name;
+            projectOption.textContent = project.name;
+            projectSelect.appendChild(projectOption);
+        });
     });
 
     taskForm.addEventListener('submit', (e) => {
         e.preventDefault();
     
+        const taskData = {
+            name: formElements.taskNameInput.value,
+            description: formElements.descriptionInput.value,
+            project: formElements.projectSelect.value || "None",  
+            dueDate: formElements.calendarInput.value,
+            priority: formElements.prioritySelect.value
+        };
+    
+        console.log("Upcoming Tasks before save:", upcomingTasks);
+        saveTask(upcomingTasks, taskData, 'upcoming');  // Save as 'upcomingTasks'
+    
+        console.log("Upcoming Tasks after save:", upcomingTasks);
+        taskForm.style.display = 'none';
+        overlay.style.display = 'none'; // Hide overlay (remove blurry effect)
+        taskForm.reset();
 
-     const taskData = {
-        name: formElements.taskNameInput.value,
-        description: formElements.descriptionInput.value,
-        project: formElements.projectSelect.value,
-        dueDate: formElements.calendarInput.value,
-        priority: formElements.prioritySelect.value
-    };
+        displayTasks(displayTaskSection, upcomingTasks, (index) => {
+            deleteTask(upcomingTasks, index);  
+            displayTasks(displayTaskSection, upcomingTasks);  
+        });
+    });
 
-    console.log("Upcoming Tasks before save:", upcomingTasks);
-
-    saveTask(upcomingTasks, taskData);
-
-    console.log("Upcoming Tasks after save:", upcomingTasks);
-    taskForm.style.display = 'none';
-    taskForm.reset();
-
+    // Display tasks when the upcoming module loads
     displayTasks(displayTaskSection, upcomingTasks, (index) => {
         deleteTask(upcomingTasks, index);
-        displayTasks(displayTaskSection, upcomingTasks, deleteTask);
+        displayTasks(displayTaskSection, upcomingTasks);
     });
-});  
-
-displayTasks(displayTaskSection, upcomingTasks, (index) => {
-deleteTask(upcomingTasks, index);
-displayTasks(displayTaskSection, upcomingTasks, deleteTask);
-});
-
 }
-
-export function loadTodayTasks() {
-    const tasks = localStorage.getItem('todayTasks');
-    return tasks ? JSON.parse(tasks) : [];
-}
-
 
 export function loadUpcomingTasks() {
-    let tasks = loadTasksFromStorage();  
+    const tasks = loadTasksFromStorage();   
     const today = new Date();
 
     return tasks.filter(task => {
         const taskDate = new Date(task.dueDate);
         return taskDate > today;  
     });
+}
+
+function updateUpcomingTasks(upcomingTasks) {
+    localStorage.setItem('upcomingTasks', JSON.stringify(upcomingTasks));
 }

@@ -34,6 +34,7 @@ export function displayTasks(tasksDisplay, tasksArray, deleteTaskCallback) {
  
         const completeButton = document.createElement('button');
         completeButton.textContent = 'Complete';
+        completeButton.id = 'complete-button';
         
  
         completeButton.addEventListener('click', () => {
@@ -41,7 +42,7 @@ export function displayTasks(tasksDisplay, tasksArray, deleteTaskCallback) {
             displayTasks(tasksDisplay, tasksArray, deleteTaskCallback);   
         });
 
-        // Append task info to taskDiv
+        
         taskDiv.appendChild(taskName);
         taskDiv.appendChild(taskDescription);
         taskDiv.appendChild(taskDueDate);

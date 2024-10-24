@@ -1,7 +1,6 @@
-// Function to display the list of projects
+ 
 export function displayProjectList(projectDisplaySection, projects) {
-    projectDisplaySection.textContent = ''; // Clear previous projects
-
+    projectDisplaySection.textContent = '';  
     projects.forEach((project, index) => {
         const projectDiv = document.createElement('div');
         projectDiv.textContent = project.name;
@@ -10,12 +9,12 @@ export function displayProjectList(projectDisplaySection, projects) {
     });
 }
 
-// Save projects to local storage
+ 
 export function saveProject(projects) {
     localStorage.setItem('projects', JSON.stringify(projects));
 }
 
-// Load projects from local storage
+ 
 export function loadProjectsFromStorage() {
     const projects = localStorage.getItem('projects');
     return projects ? JSON.parse(projects) : [];

@@ -1,19 +1,25 @@
-import { saveTask, deleteTask, displayTasks } from './taskManager';
-import { loadTasksFromStorage } from './taskManager';
+import { saveTask, deleteTask, displayTasks, loadTasksFromStorage } from './taskManager';
 import { createTaskForm } from './form';
 
 let projectsArray = [];   
 
  
+loadProjectsFromStorage();
+
+export function getProjectsArray() {
+    return projectsArray;
+}
+
 export function loadProjects() {
     const content = document.querySelector("#content");
-    content.textContent = '';  
+    content.textContent = '';   
 
     const heading = document.createElement('h1');
     heading.textContent = "Projects";
 
     const createProjectButton = document.createElement('button');
     createProjectButton.textContent = "Create Project";
+    createProjectButton.id = "create-project";
 
     // Project display section
     const projectDisplaySection = document.createElement('div');
@@ -23,7 +29,7 @@ export function loadProjects() {
     content.appendChild(createProjectButton);
     content.appendChild(projectDisplaySection);
 
-    // Handle project creation
+ 
     createProjectButton.addEventListener('click', () => {
         const projectForm = document.createElement('form');
         const projectNameInput = document.createElement('input');
@@ -32,6 +38,7 @@ export function loadProjects() {
         projectNameInput.required = true;
         const addProjectButton = document.createElement('button');
         addProjectButton.textContent = 'Add';
+        addProjectButton.id = "add-project";
 
         projectForm.appendChild(projectNameInput);
         projectForm.appendChild(addProjectButton);
@@ -48,7 +55,7 @@ export function loadProjects() {
         });
     });
 
-    // Display any saved projects
+    // Display saved projects
     projectsArray.forEach((project, index) => {
         displayProject(projectDisplaySection, project, index);
     });
@@ -56,10 +63,19 @@ export function loadProjects() {
 
 function createProject(projectName) {
     const newProject = { name: projectName, tasks: [] };
-    projectsArray.push(newProject);
-    updateProjectStorage();
-    loadProjects();   
+    projectsArray.push(newProject);  
+    updateProjectStorage();   
+    displayProject(document.getElementById('projectDisplay'), newProject, projectsArray.length - 1);
 }
+
+function saveTaskToProject(projectName, taskData) {
+    const project = projectsArray.find(proj => proj.name === projectName);
+    if (project) {
+        project.tasks.push(taskData);   
+        updateProjectStorage();
+    }
+}
+
 
 function displayProject(container, project, index) {
     const projectDiv = document.createElement('div');
@@ -70,12 +86,14 @@ function displayProject(container, project, index) {
 
     const addTaskButton = document.createElement('button');
     addTaskButton.textContent = 'Add Task';
+    addTaskButton.id = "add-task"
 
     const taskDisplaySection = document.createElement('div');
     taskDisplaySection.classList.add('task-display');
 
     const deleteProjectButton = document.createElement('button');
     deleteProjectButton.textContent = 'Delete Project';
+    deleteProjectButton.id ="delete-project"
 
     projectDiv.appendChild(projectNameHeading);
     projectDiv.appendChild(addTaskButton);
@@ -83,21 +101,21 @@ function displayProject(container, project, index) {
     projectDiv.appendChild(deleteProjectButton);
     container.appendChild(projectDiv);
 
-    // Task form from form.js
+   
     const formElements = createTaskForm();
     const { taskForm } = formElements;
-    taskForm.style.display = 'none';   
+    taskForm.style.display = 'none';  
     projectDiv.insertBefore(taskForm, taskDisplaySection);   
 
-    // Show task form when "Add Task" is clicked
+ 
     addTaskButton.addEventListener('click', () => {
-        taskForm.style.display = 'block';  // Display the form
+        taskForm.style.display = taskForm.style.display === 'none' ? 'block' : 'none';   
     });
 
-    // Handle task addition for each project
+    
     taskForm.addEventListener('submit', (e) => {
         e.preventDefault();
-
+    
         const taskData = {
             name: formElements.taskNameInput.value,
             description: formElements.descriptionInput.value,
@@ -105,47 +123,47 @@ function displayProject(container, project, index) {
             dueDate: formElements.calendarInput.value,
             priority: formElements.prioritySelect.value
         };
-
-        saveTask(project.tasks, taskData);   
+    
+        // Save the task specifically to the selected project
+        saveTaskToProject(project.name, taskData);
+    
+        // Display updated tasks for this project only
         displayTasks(taskDisplaySection, project.tasks, (taskIndex) => {
             deleteTask(project.tasks, taskIndex);
-            displayTasks(taskDisplaySection, project.tasks, deleteTask);
+            displayTasks(taskDisplaySection, project.tasks);
         });
-
-        taskForm.reset();  
-        taskForm.style.display = 'none';  
+    
+        taskForm.reset();
+        taskForm.style.display = 'none';
     });
+    
 
-    // Display tasks for this project
+    
     displayTasks(taskDisplaySection, project.tasks, (taskIndex) => {
         deleteTask(project.tasks, taskIndex);
-        displayTasks(taskDisplaySection, project.tasks, deleteTask);
+        displayTasks(taskDisplaySection, project.tasks);
     });
 
-    // Handle project deletion
+     
     deleteProjectButton.addEventListener('click', () => {
         projectsArray.splice(index, 1);   
         updateProjectStorage();
-        loadProjects();  
+        projectDiv.remove();   
     });
 }
 
-// Save projects to localStorage
+ 
 function updateProjectStorage() {
     localStorage.setItem('projects', JSON.stringify(projectsArray));
 }
 
-// Load projects from localStorage
+ 
 export function loadProjectsFromStorage() {
     const storedProjects = localStorage.getItem('projects');
     projectsArray = storedProjects ? JSON.parse(storedProjects) : [];
 }
 
- 
-
-export function loadProjectTasks() {
+export function loadProjectTasks(projectName) {
     const allTasks = loadTasksFromStorage();   
-
-    const projectTasks = allTasks.filter(task => task.project === 'ProjectName'); 
-    return projectTasks;  
+    return allTasks.filter(task => task.project === projectName);   
 }
